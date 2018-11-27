@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+      <!-- Product Customize -->
+        <record id="action_open_quotation_products" model="ir.actions.act_window">
+            <field name="name">Quotation List</field>
+            <field name="res_model">quotation.product.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_product_id': active_id}</field>
+            <field name="domain">[('product_id','=',active_id)]</field>
+        </record>
+
+        <!--Form-->
+    <record id="view_form_product_product_inherit" model="ir.ui.view">
+        <field name="name">product.product.view.form.inherit.so.prod.append</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="open_br_product_append" string="Add to Requirement." class="oe_stat_button" type="object" icon="fa-plus" context="{'default_quotation_id':active_id}"/>
+                <button name="%(action_open_quotation_products)d" string="History Requirement" class="oe_stat_button" type="action" icon="fa fa-align-justify"/>
+            </xpath>
+        </field>
+    </record>
+    
+      <record id="partner_search_form_view_inherit" model="ir.ui.view">
+          <field name="name">res.partner.select</field>
+          <field name="model">res.partner</field>
+          <field name="inherit_id" ref="base.view_res_partner_filter"/>
+          <field name="arch" type="xml">
+              <xpath expr="//field[@name='name']" position="after">
+                <field name="partner_brand_id" string="Brand" groups="sales_team.group_sale_salesman,purchase.group_purchase_user"/>
+              </xpath>
+            </field>
+          </record>
+
+   <!--Kanban-->
+    <record id="view_kanban_product_product_inherit" model="ir.ui.view">
+        <field name="name">product.product.view.kanban.inherit.so.prod.append</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//ul[1]" position="inside">
+                <li>
+                    <a name="open_br_product_append" type="object" t-attf-data-context="{'default_quotation_id':active_id}">
+                        <i class="fa fa-plus"/> Add to Requirement.
+                    </a>
+                </li>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Contract Customize -->
+    <record id="customer_product_list_action_window" model="ir.actions.act_window">
+        <field name="name">Quote List</field>
+        <field name="res_model">product.quotation</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_customer_id': active_id}</field>
+        <field name="domain">[('customer_id','=',active_id)]</field>
+    </record>
+
+    <record id="company_product_list_action_window" model="ir.actions.act_window">
+        <field name="name">Quotation List</field>
+        <field name="res_model">sale.requirement</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_partner_id': active_id}</field>
+        <field name="domain">[('partner_id','=',active_id)]</field>
+    </record>
+    
+    <record id="customer_product_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.quote.buttons</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+        <button name="toggle_active" position="before">
+              <button type="action" class="oe_stat_button" id="product_list_button"
+                      icon="fa-pencil-square-o" name="%(customer_product_list_action_window)d">
+                  <div class="o_stat_info">
+                      <field name="product_count" widget="statinfo"/>
+                  </div>
+              </button>
+              <button type="action" class="oe_stat_button" id="quotation_list_button"
+                      icon="fa-pencil-square-o" name="%(company_product_list_action_window)d" attrs="{'invisible': [('is_company','!=',True)]}">
+                  <div class="o_stat_info">
+                      <field name="requirement_count" widget="statinfo"/>
+                  </div>
+              </button>
+        </button>
+        </field>
+    </record>
+
+    <!--Sale Order Customize -->
+    <record id="sale_order_product_list_action_window" model="ir.actions.act_window">
+        <field name="name">Product List</field>
+        <field name="res_model">sale.order.line</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'default_order_id': active_id}</field>
+        <field name="domain">[('order_id','=',active_id)]</field>
+    </record>
+
+    <record id="sale_order_requirement_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.customer.requirement</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+        <button name="action_view_invoice" position="before">
+              <button type="action" class="oe_stat_button" id="product_list_button"
+                      icon="fa fa-reorder fa-fw" name="%(sale_order_product_list_action_window)d">
+                  <div class="o_stat_info">
+                      <field string="Product" name="product_count" widget="statinfo"/>
+                  </div>
+              </button>
+        </button>
+        <xpath expr="//field[@name='order_line']/tree" position="after">
+            <field name="quotation_id" readonly="1"/>
+        </xpath>
+        </field>
+    </record>
+
+      <record id="application_tags" model="ir.actions.act_window">
+          <field name="name">product.application</field>
+          <field name="res_model">product.application</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click and create a application for Product now!
+            </p>
+          </field>
+      </record>
+
+        <record id="product_template_action_all" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="view_type">form</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to define a new product.
+                </p>
+            </field>
+        </record>      
+
+        <record id="product_application_form_view" model="ir.ui.view">
+            <field name="name">product.application.form</field>
+            <field name="model">product.application</field>
+            <field name="arch" type="xml">
+                <form class="oe_form_configuration">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button"
+                                name="%(product_template_action_all)d"
+                                icon="fa-th-list"
+                                type="action"
+                                context="{'search_default_application': active_id}">
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" string="Application" class="oe_edit_only"/>
+                            <h1><field name="name" placeholder="e.g. Washing room"/></h1>
+                        </div>
+                        <group name="first" col="2">
+                            <field name="parent_id" class="oe_inline"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+      <record id="view_application_tags_tree" model="ir.ui.view">
+          <field name="name">product.application.tree</field>
+          <field name="model">product.application</field>
+          <field name="arch" type="xml">
+              <tree string="Tags">
+                  <field name="name"/>
+                  <field name="description"/>
+              </tree>
+          </field>
+      </record>
+
+        <record id="product_application_search_view" model="ir.ui.view">
+            <field name="name">product.application.search</field>
+            <field name="model">product.application</field>
+            <field name="arch" type="xml">
+                <search string="Product Categories">
+                    <field name="name" string="Product Application"/>
+                    <field name="parent_id"/>
+                </search>
+            </field>
+        </record>
+
+      <menuitem id="product_application_tags"
+                name="Application"  
+                parent="sale.menu_sale_config" 
+                action="application_tags"
+                sequence="3"/>
+</odoo>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+  <data>
+        <!-- actions opening views on models -->
+        <!-- 询盘产品 action -->
+        <record id="requirement_list_action_window" model="ir.actions.act_window">
+            <field name="name">Requirement_List</field>
+            <field name="res_model">product.quotation</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_requirement_id': active_id}</field>
+            <field name="domain">[('requirement_id','=',active_id)]</field>
+        </record>
+        <!-- 设定询盘编码 -->
+        <record id="inquiry_number_sequence" model="ir.sequence">
+            <field name="name">Inquiry Number</field>
+            <field name="code">requirement.inquiry</field>
+            <field name="prefix"></field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="act_product_requirement_tree_view">
+            <field eval="1" name="sequence"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="product_requirement_tree"/>
+            <field name="act_window_id" ref="requirement_list_action_window"/>
+        </record>
+
+        <record id="unsure_list_action_window" model="ir.actions.act_window">
+            <field name="name">Requirement_List</field>
+            <field name="res_model">product.quotation</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_requirement_id': active_id}</field>
+            <field name="domain">[('requirement_id','=',active_id),('is_accept','!=',True)]</field>
+        </record>
+
+        <record id="project_product_list_action_window" model="ir.actions.act_window">
+            <field name="name">Product_List</field>
+            <field name="res_model">quotation.product.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_pdt_requirement': active_id}</field>
+            <field name="domain">[('pdt_requirement','=',active_id)]</field>
+        </record>
+
+      <!-- quotation form -->
+      <record id="form_sale_quotation" model="ir.ui.view">
+          <field name="name">sale.requirement.form</field>
+          <field name="model">sale.requirement</field>
+          <field name="arch" type="xml">
+              <form stirng="Requirement Form">
+                <field name="number_of_unsure" invisible="1"/>
+                <field name="is_accept" invisible="1"/>
+                <header>
+                    <button name="btn_accept" type="object"
+                            class="oe_highlight" string="Order Confirm" attrs="{'invisible': [('is_accept','=',True)]}"/>
+                    <button name="action_create_order_new" type="object"
+                            string="创建报价单" attrs="{'invisible': [('number_of_unsure','!=',0)]}"/>
+                </header>
+                  <sheet>
+                    <!-- 询盘视图按钮 -->
+                    <div class="oe_button_box" name="button_box">
+                      <button type="action" class="oe_stat_button" id="requirement_list_button"
+                              icon="fa-pencil-square-o" name="%(requirement_list_action_window)d">
+                          <div class="o_stat_info">
+                              <field name="number_of_quote" widget="statinfo"/>
+                          </div>
+                      </button>
+                      <button type="action" id="unsure_product_list_button"
+                              icon="fa-pencil-square-o" name="%(unsure_list_action_window)d" attrs="{'invisible': [('number_of_unsure','=',0)]}">
+                          <div class="o_stat_info">
+                              <field name="number_of_unsure" widget="statinfo"/>
+                          </div>
+                      </button>
+                      <button type="action" class="oe_stat_button" id="product_list_button"
+                              icon="fa fa-shopping-basket" name="%(project_product_list_action_window)d" attrs="{'invisible': [('number_of_product', '=', 0)]}">
+                          <div class="o_stat_info">
+                              <field name="number_of_product" widget="statinfo"/>
+                          </div>
+                      </button>
+                    </div>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" default_focus="1" placeholder="Project Name"/>
+                        </h1>
+                        <div class="o_row">
+                            <field name="partner_id" domain="[('is_company', '=', True),('customer','=',True)]" required="1"/>
+                        </div>
+                    </div>
+                  <group>
+                    <group string="Project location">
+                      <label for="street" string="Address"/>
+                      <div class="o_address_format">
+                          <field name="street" placeholder="Street..." class="o_address_street" />
+                          <field name="street2" placeholder="Street 2..." class="o_address_street" />
+                          <field name="city" placeholder="City" class="o_address_city" />
+                          <field name="state_id" class="o_address_state" placeholder="State" options="{&quot;no_open&quot;: True}"  context="{'country_id': country_id, 'zip': zip}"/>
+                          <field name="zip" placeholder="ZIP" class="o_address_zip" />
+                          <field name="country_id" placeholder="Country" class="o_address_country" options="{&quot;no_open&quot;: True, &quot;no_create&quot;: True}" />
+                      </div>
+                    </group>
+                  </group>
+                  <group name="members">
+                      <group string="Project Information">
+                          <field name="brand"/>
+                          <field name="barcode"/>
+                          <field name="order_id" readonly="1"/>
+                          <field name="department" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                          <field name="staff_id"/>
+                          <field name="currency_id" string="Currency" readonly="1"/>
+                          <field name="project_manager"/>
+                      </group>
+                      <group string="Budget">
+                          <h1>
+                            <field name="total_budget" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                          </h1>
+                      </group>
+                      <group string="Hotel Information">
+                        <field name="hotel_style" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        <field name="scenario_id" widget="many2many_tags" options="{'color_field': 'color', 'no_create_edit': True}"/>
+                        <field name="response_schedule"/>
+                        <field name="build_area"/>
+                      </group>
+                  </group>
+                  </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+              </form>
+          </field>
+      </record>
+
+      <!-- requirement_tree -->
+      <record id="requirement_tree" model="ir.ui.view">
+          <field name="name">sale.requirement.tree</field>
+          <field name="model">sale.requirement</field>
+          <field name="arch" type="xml">
+            <tree string="Quotation Tree">
+                <field name="name"/>
+                <field name="number_of_quote"/>
+                <field name="number_of_unsure"/>
+            </tree>
+          </field>
+      </record>
+
+      <!-- quotation action and menuitem-->
+      <record id="action_sale_quotation" model="ir.actions.act_window">
+          <field name="name">Requirement List</field>
+          <field name="res_model">sale.requirement</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click and create your Requirement now!
+            </p>
+          </field>
+      </record>
+
+      <record id="action_tags_quotation" model="ir.actions.act_window">
+          <field name="name">Tags for QT</field>
+          <field name="res_model">quotation.tags</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click and create a State for quotation now!
+            </p>
+          </field>
+      </record>
+
+      <record id="view_quotation_tags_tree" model="ir.ui.view">
+          <field name="name">quotation.tags.tree</field>
+          <field name="model">quotation.tags</field>
+          <field name="arch" type="xml">
+              <tree string="Feedback Tags">
+                  <field name="name"/>
+                  <field name="requirements"/>
+              </tree>
+          </field>
+      </record>
+
+      <record id="action_hotel_style_tags" model="ir.actions.act_window">
+          <field name="name">Tags for Hotel Style</field>
+          <field name="res_model">requirement.tags</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click and create a tag for Hotel Style now!
+            </p>
+          </field>
+      </record>
+
+      <record id="view_hotel_style_tree" model="ir.ui.view">
+          <field name="name">requirement.tags.tree</field>
+          <field name="model">requirement.tags</field>
+          <field name="arch" type="xml">
+              <tree string="Hotel Style">
+                  <field name="name"/>
+                  <field name="description"/>
+              </tree>
+          </field>
+      </record>
+      <record id="action_scenario_tags" model="ir.actions.act_window">
+          <field name="name">scenario.tags</field>
+          <field name="res_model">scenario.tags</field>
+          <field name="view_type">form</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Click and create a tag for requirment scenario now!
+            </p>
+          </field>
+      </record>
+
+      <record id="view_scenario_tags_tree" model="ir.ui.view">
+          <field name="name">scenario.tags.tree</field>
+          <field name="model">scenario.tags</field>
+          <field name="arch" type="xml">
+              <tree string="Tags">
+                  <field name="name"/>
+                  <field name="description"/>
+              </tree>
+          </field>
+      </record>
+
+      <menuitem id="sale_quotation_menu"
+                name="Requirement"  
+                parent="main_menu_sale_quotation" sequence="1"/>
+
+      <menuitem id="sale_requirement_management"
+                name="Management"  
+                parent="main_menu_sale_quotation" 
+                sequence="10"/>
+
+      <menuitem id="sale_requirement_tags_quotation"
+                name="Feedback Tags"  
+                parent="sale_requirement_management" 
+                action="action_tags_quotation"
+                sequence="1"/>
+
+      <menuitem id="sale_requirement_hotel_style"
+                name="Hotel Style"  
+                parent="sale_requirement_management" 
+                action="action_hotel_style_tags"
+                sequence="2"/>
+
+      <menuitem id="sale_requirement_requirement_scenario"
+                name="Requirement Scenario"  
+                parent="sale_requirement_management" 
+                action="action_scenario_tags"
+                sequence="3"/>
+
+      <menuitem id="sale_quotation"  
+                name="Requirement List" 
+                parent="sale_quotation_menu"
+                action="action_sale_quotation"/>
+  </data>
+</odoo>

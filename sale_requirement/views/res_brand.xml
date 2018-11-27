@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  product_brand for Odoo
+  Copyright (C) 2009 NetAndCo <http://www.netandco.net>.
+  Copyright (C) 2011 Akretion Benoît Guillot <benoit.guillot@akretion.com>
+  Copyright (C) 2014 prisnet.ch Seraphine Lantible <s.lantible@gmail.com>
+  Copyright (C) 2015 Leonardo Donelli <http://www.wearemonk.com>
+  Contributors:
+  Mathieu Lemercier <mathieu@netandco.net>
+  Franck Bret <franck@netandco.net>
+  Seraphine Lantible <s.lantible@gmail.com>
+  Leonardo Donelli <donelli@webmonks.it>
+-->
+<odoo>
+    <data>
+        <record id="product_brand_search_form_view" model="ir.ui.view">
+            <field name="name">res.brand.search.form</field>
+            <field name="model">res.brand</field>
+            <field name="arch" type="xml">
+                <search string="Product Brand">
+                    <field name="name"/>
+                    <field name="partner_ids"/>
+                </search>
+            </field>
+        </record>
+
+        <act_window
+            id="action_open_brand_products"
+            name="Brand Products"
+            res_model="product.template"
+            view_type="form"
+            view_mode="kanban,form,tree"
+            domain="[('product_brand_id', '=', active_id)]"/>
+
+        <act_window
+            id="action_open_brand_partners"
+            name="Brand Partners"
+            res_model="res.partner"
+            view_type="form"
+            view_mode="kanban,form,tree"
+            domain="[('partner_brand_id', '=', active_id)]"/>
+
+
+        <record id="view_product_brand_form" model="ir.ui.view">
+            <field name="name">res.brand.form</field>
+            <field name="model">res.brand</field>
+            <field name="arch" type="xml">
+                <form string="Product Brand">
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button
+                                class="oe_inline oe_stat_button"
+                                type="action"
+                                name="%(action_open_brand_products)d"
+                                icon="fa-cubes">
+                                <field name="product_count" string="Products" widget="statinfo" />
+                            </button>
+                            <button
+                                class="oe_inline oe_stat_button"
+                                type="action"
+                                name="%(action_open_brand_partners)d"
+                                icon="fa fa-users">
+                                <field name="partner_count" string="Partners" widget="statinfo" />
+                            </button>
+                        </div>
+                        <field name="logo" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <div class="oe_edit_only">
+                                <label for="name" string="Brand Name"/>
+                            </div>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <group string="Description">
+                            <field name="description" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_product_brand_tree" model="ir.ui.view">
+            <field name="name">res.brand.tree</field>
+            <field name="model">res.brand</field>
+            <field name="arch" type="xml">
+                <tree string="res.brand">
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="partner_count"/>
+                    <field name="product_count"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_product_brand_kanban" model="ir.ui.view">
+            <field name="name">res.brand.kanban</field>
+            <field name="model">res.brand</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="name"/>
+                    <field name="logo"/>
+                    <field name="product_count"/>
+                    <field name="product_count"/>
+                    <field name="description"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                  <div class="o_kanban_image">
+                                      <img t-if="record.logo" t-att-src="'data:image/png;base64,'+record.logo"/>
+                                  </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record id="product_search_form_view" model="ir.ui.view">
+            <field name="name">product.search.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_search_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[last()]" position="after">
+                    <field name="product_brand_id"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <record id="view_product_template_search_brand" model="ir.ui.view">
+            <field name="name">product.template.search.brand</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[last()]" position="after">
+                    <field name="product_brand_id"/>
+                </xpath>
+<!--                 
+                <group string='Group by...' position="inside">
+                    <filter string="Brand" name="groupby_brand" domain="[]"
+                            context="{'group_by' : 'product_brand_id'}"/>
+                </group> -->
+                
+            </field>
+        </record>
+
+        <record id="product_template_form_brand_add" model="ir.ui.view">
+            <field name="name">product.template.product.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view" />
+            <field name="arch" type="xml">
+                <field name="name" position="after"  >
+                    <div>
+                        <field name="product_brand_id" placeholder="Brand"/>
+                    </div>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_product_template_tree_brand" model="ir.ui.view">
+            <field name="name">product tree view: add brand</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_tree_view" />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="product_brand_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_product_variant_tree_brand" model="ir.ui.view">
+            <field name="name">product variant tree view: add brand</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view" />
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                    <field name="product_brand_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_product_brand">
+            <field name="name">Brand</field>
+            <field name="res_model">res.brand</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,form,tree</field>
+        </record>
+
+        <menuitem
+            name="Brands"
+            id="menu_product_brand"
+            action="action_product_brand"
+            parent="contacts.res_partner_menu_config"/>
+    </data>
+</odoo>

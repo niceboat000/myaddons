@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  product_brand for Odoo
+  Copyright (C) 2009 NetAndCo <http://www.netandco.net>.
+  Copyright (C) 2011 Akretion Benoît Guillot <benoit.guillot@akretion.com>
+  Copyright (C) 2014 prisnet.ch Seraphine Lantible <s.lantible@gmail.com>
+  Copyright (C) 2015 Leonardo Donelli <http://www.wearemonk.com>
+  Contributors:
+  Mathieu Lemercier <mathieu@netandco.net>
+  Franck Bret <franck@netandco.net>
+  Seraphine Lantible <s.lantible@gmail.com>
+  Leonardo Donelli <donelli@webmonks.it>
+-->
+<odoo>
+    <data>
+        <record id="product_brand_search_form_view" model="ir.ui.view">
+            <field name="name">res.department.search.form</field>
+            <field name="model">res.department</field>
+            <field name="arch" type="xml">
+                <search string="Department">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_department_form" model="ir.ui.view">
+            <field name="name">res.department.form</field>
+            <field name="model">res.department</field>
+            <field name="arch" type="xml">
+                <form string="Department">
+                    <sheet>
+                        <div class="oe_title">
+                            <div class="oe_edit_only">
+                                <label for="name" string="Department"/>
+                            </div>
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <group string="Description">
+                            <field name="description" nolabel="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_department_tree" model="ir.ui.view">
+            <field name="name">res.department.tree</field>
+            <field name="model">res.department</field>
+            <field name="arch" type="xml">
+                <tree string="res.department">
+                    <field name="name"/>
+                    <field name="description"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="partner_search_form_view_department" model="ir.ui.view">
+            <field name="name">res.partner.select.department</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[last()]" position="after">
+                    <field name="department" domain="[('is_company','=',False)]"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_partner_form_department" model="ir.ui.view">
+            <field name="name">res.partner.form.department</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="department" widget="many2many_tags" attrs="{'invisible': [('is_company','=', True)]}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="res_department_line_form" model="ir.ui.view">
+            <field name="name">res.department.line.form</field>
+            <field name="model">res.department.line</field>
+            <field name="mode">primary</field>
+            <field name="priority" eval="8"/>
+            <field name="arch" type="xml">
+                <form string="Department Requirement">
+                    <group name="main_field">
+                        <field name="product_quot_id" invisible="1"/>
+                        <field name="department_id" widget="many2many_tags" readonly="1"/>
+                        <field name="user_id" invisible="1"/>
+                        <field name="values"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_res_department">
+            <field name="name">Department</field>
+            <field name="res_model">res.department</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem
+            name="Department"
+            id="menu_res_department"
+            action="action_res_department"
+            parent="contacts.res_partner_menu_config"/>
+    </data>
+</odoo>
