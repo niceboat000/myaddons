@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="quotation_product_line_search_form_view" model="ir.ui.view">
+            <field name="name">quotation.product.line.search.form</field>
+            <field name="model">quotation.product.line</field>
+            <field name="arch" type="xml">
+                <search string="Quotation">
+                    <field name="product_id"/>
+                    <field name="pdt_quote"/>
+                    <field name="pdt_requirement"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_quotation_product_line_form" model="ir.ui.view">
+            <field name="name">quotation.product.line.form</field>
+            <field name="model">quotation.product.line</field>
+            <field name="arch" type="xml">
+                <form string="Product">
+                    <sheet>
+                      <field name="image" widget="image" class="oe_avatar"/>
+                          <div class="oe_title">
+                              <label class="oe_edit_only" for="product_id" string="Product Name"/>
+                              <h1><field name="product_id" placeholder="Product Name"/></h1>
+                          </div>
+                        <group>
+                            <group string="Product Information">
+                              <field name="pdt_requirement"/>
+                              <field name="uom_id"/>
+                              <field name="product_uom_qty"/>
+                              <field name="price_unit" widget="monetary"  options="{'currency_field': 'pricing_currency_id'}"/>
+                              <field name="market_price" widget="monetary"  options="{'currency_field': 'currency_id'}"/>
+                              <field name="min_qty"/>
+                              <field name="currency_id" invisible="1"/>
+                              <field name="pricing_currency_id" invisible="1"/>
+                              <field name="valid_date" readonly="1"/>
+                              <field name="create_date" readonly="1"/>
+                              <field name="valid_length"/>
+                              <field name="name"/>
+                            </group>
+                        </group>
+                        <notebook>
+                        <page string="Images" name="customer_images">
+                            <field name="customer_images" mode="kanban" context="{'default_name': name, 'default_product_quot_id': active_id}">
+                                <kanban string="Product Images">
+                                    <field name="name"/>
+                                    <field name="image"/>
+                                    <templates>
+                                        <t t-name="kanban-box">
+                                            <div class="oe_kanban_global_click">
+                                                <a t-if="!read_only_mode" type="delete" class="fa fa-times pull-right"/>
+                                                <div class="o_kanban_image">
+                                                    <img t-if="record.image.raw_value" t-att-src="'data:image/png;base64,'+record.image.raw_value"/>
+                                                </div>
+                                                <div class="oe_kanban_details">
+                                                    <field name="name"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                            </field>
+                        </page>
+                        <page string="PRICING">
+                          <group>
+                              <group>
+                               <field name="price_rate"/>
+                               <field name="pricing_currency_id"/>
+                               <field name="price_unit" options="{'currency_field': 'pricing_currency_id'}"/>
+                             </group>
+                               <div class="pull-right">
+                                <h1>Total:<field name="market_price" options="{'currency_field': 'currency_id'}"/></h1>
+                               </div>
+                          </group>
+                       </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_quotation_product_line_tree" model="ir.ui.view">
+            <field name="name">quotation.product.line.tree</field>
+            <field name="model">quotation.product.line</field>
+            <field name="arch" type="xml">
+                <tree string="Product">
+                    <field name="product_id"/>
+                    <field name="pdt_quote"/>
+                    <field name="pdt_requirement"/>
+                    <field name="product_uom_qty"/>
+                    <field name="uom_id"/>
+                    <field name="price_unit" widget="monetary"  options="{'currency_field': 'pricing_currency_id'}"/>
+                    <field name="market_price" widget="monetary"  options="{'currency_field': 'currency_id'}"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_quotation_product_line_kanban" model="ir.ui.view">
+            <field name="name">quotation.product.line.kanban</field>
+            <field name="model">quotation.product.line</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="product_id"/>
+                    <field name="pdt_requirement"/>
+                    <field name="uom_id"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                  <div class="o_kanban_image">
+                                      <img t-if="record.image" t-att-src="'data:image/png;base64,'+record.image"/>
+                                  </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title"><field name="name"/></strong>
+                                    <ul>
+                                        <li><strong>Cost: <field name="price_unit"></field></strong></li>
+                                        <li><strong>Price: <field name="market_price"></field></strong></li>
+                                        <li><strong>QTY: <field name="product_uom_qty"></field></strong></li>
+                                        <li><strong>Unit: <field name="uom_id"></field></strong></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_all_quotation">
+            <field name="name">Product</field>
+            <field name="res_model">quotation.product.line</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">kanban,form,tree</field>
+        </record>
+  
+  </data>
+</odoo>
